@@ -1,37 +1,34 @@
 'use strict';
 
 let vorpal = require('vorpal')();
-let fireBaseAdd = require('./functs.js');
+let fireBase = require('./functs.js');
  vorpal
-   .command('add <name> [phoneNumber]', 'Add user datas')
+   .command('add -n <name> <phoneNumber>', 'Add user datas')
    .option('-n, --name', "Adds full name e.g 'Andela Clinton' ")
-   .option('-p, --phoneNumber', "Adds phone number e.g '080********' ")
+   .option('-p, --phoneNumber', "Adds phone number e.g 080******** ")
    .description('Outputs "save".')
    .action(function(args, callback) {
+    let new_number = args.phoneNumber; //Convert user input to a string so we can get the length
     let fullName = args.name;
+    new_number = "0" + new_number.toString();
    	let contactName = fullName.split(" "); //Splitting the names value to get first and last name
-    let new_number = "0" + args.phoneNumber ; //Convert user input to a string so we can get the length
    	//if(fullName.length > 3 && new_number.length===11){ //Validate the length of user's input
-   		if(fireBaseAdd.addToDataBase(contactName[0], contactName[1], new_number)){
-      // console.log(fireBaseAdd.fetchFromDataBase())
-      console.log(new_number);
+   	if(fireBase.addToDataBase(contactName[0], contactName[1], new_number)){
+      fireBase.fetchFromDataBase();
    		console.log("Added Successfully!")
    	}
-   	// else{
-   	// 	console.log("Invalid Details supplied!")
-   	// }
       
      callback();
    });
 
    vorpal
-   .command('search <name> [phoneNumber]', 'searches for a users data')
-   // .option('search', "searchs for users firstname e.g 'Andela' ")
-   // .description('Outputs "search"')
+   .command('search <name>', 'searches for a users data')
+   .option('search', "searchs for users firstname e.g 'Andela' ")
+   .description('Outputs "search"')
    .action(function(args, callback) {
-    var searchTerm = args.name;
-    //var contactList; //fetch 
-    var searchResult = search(searchTerm);
+    var searchTerms = args.name;
+    fireBase.search(searchTerms);
+    
 
     callback();
   });     
