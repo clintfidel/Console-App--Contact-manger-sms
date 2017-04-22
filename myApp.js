@@ -4,9 +4,6 @@ let vorpal = require('vorpal')();
 const chalk = require('chalk');
 let CLI = require('clui');
 var figlet = require('figlet');
-var Spinner = CLI.Spinner;
-var status = new Spinner('Fetching from database, please wait...');
-
 console.log(
   chalk.blue(
     figlet.textSync('My Contact App', {
@@ -39,10 +36,11 @@ vorpal
     let new_number = args.phoneNumber; //Convert user input to a string so we can get the length
     let fullName = args.name;
     new_number = "0" + new_number.toString();
+    let reg = /[0-9]/;
     let contactName = fullName.split(" "); //Splitting the names value to get first and last name
-    if (fullName.length > 3 && new_number.length === 11 
-    && contactName[1] != undefined 
-    && contactName[0].match(/[0-9]/g) === false) { //Validate the length of user's input
+    if (fullName.length > 3 && new_number.length === 11 &&
+      contactName[1] != undefined &&
+      (!reg.test(contactName[0]) && (!reg.test(contactName[1])))) { //Validating user input
 
       if (fireBase.addToDataBase(contactName[0], contactName[1], new_number)) {
         console.log(chalk.bold.green("Added Successfully!"))
@@ -58,8 +56,9 @@ vorpal
     callback();
   });
 
+//vorpal command for saerch function
 vorpal
-  .command('search <name>', 'searches for a users data') 
+  .command('search <name>', 'searches for a users data')
   .option('search', "searchs for users firstname e.g 'Andela' ")
   .description('Outputs "search"')
   .action(function(args, callback) {
@@ -68,6 +67,7 @@ vorpal
 
   });
 
+// vorpal command for sending text to user
 vorpal
   .command('text <name>', 'Sends sms to contact')
   .option('-m, --message', "Sends specified message to user")
@@ -75,44 +75,14 @@ vorpal
   .action(function(args, callback) {
     var name = fireBase.searchContact(args.name);
     var new_message = args.message;
-    
-   name.then(function(result){
-    console.log()
-   })
-   
+
+    name.then(function(result) {
+      console.log()
+    })
 
     callback();
   });
 
-// vorpal
-// .command('delete <name> [phoneNumber]', 'delete contact')
-// .option('-d, --message', "deletes specified user contact")
-// .description('Outputs "deletes contact"')
-// .action(function(args, callback) {
-//   var deleteName = args.name;
-//   var deleteNum = args.phoneNumber;
-//   if (fireBase.sendSms(name, new_message)) {
-//     console.log(chalk.bold.green("text successfully sent"))
-//   }
-
-//   callback();
-//   });
-
-
 vorpal
   .delimiter('Contact-App$')
   .show();
-
-// function checkName(name){
-//  if(name.match(/[w_]/+)){
-//    return true;
-//  }
-//  return false;
-// }
-
-// function checkNum(num){
-//  if(num.match(/[\d]/)){
-//    return true;
-//  }
-//  return false;
-// }
