@@ -55,20 +55,20 @@ vorpal
   .description('Outputs "search"')
   .action(function(args, callback) {
     var searchTerms = args.name;
-    fireBase.searchContact(searchTerms);
-    callback();
+      fireBase.searchContact(searchTerms)
+    
   });
 
 vorpal
    .command('text <name>', 'Sends sms to contact')
-   .option('-m,--text <message>', "Sends specified message to user")
-   .description('Outputs "search"')
+   .option('-m, --message', "Sends specified message to user")
+   .description('Outputs "send sms"')
    .action(function(args, callback) {
-    var new_num = args.name;
-    var new_message= args.text
-     fireBase.sendSms(num, msg);
-     // if(fireBase.sendSms===search)
-     console.log("text successfully sent")
+    var name = fireBase.searchForSms(args.name);
+    var new_message = args.message;
+     name.then(fireBase.sendSms(name, new_message), console.log("error"))
+    
+     
     callback();
   });     
 
