@@ -30,7 +30,7 @@ var getDataFromDataBase = {
 
   },
 
-  search: function(searchTerm) {
+  searchContact: function(searchTerm) {
     ref.on("value", function(snapshot) {
       var valx = snapshot.val();
       var data = Object.values(valx);
@@ -61,24 +61,23 @@ var getDataFromDataBase = {
     });
   },
 
-  //  sendSms: function(num, msg){
-  //        var payload = {
-  //          to: 07038399928,
-  //          from: 'Clintfidel',
-  //          message: hello world
-  //        };
+  sendSms: function(num, msg) {
+    var payload = {
+      to: num,
+      from: 'Clintfidel',
+      message: msg
+    };
 
-  //       jusibe.sendSMS(payload, function (err, res) {
-  //        if (res.statusCode === 200)
-  //          console.log(res.body);
-  //        else
-  //          console.log(err);
-  //      }); 
-  // }
+    jusibe.sendSMS(payload, function(err, res) {
+      if (res.statusCode === 200)
+        console.log(res.body);
+      else
+        console.log(err);
+    });
+  },
 
-  // function (errorObject) {
-  // console.log("The read failed: " + errorObject.code);
-
+  function(errorObject) {
+    console.log("The read failed: " + errorObject.code);
+  }
 }
-
 module.exports = getDataFromDataBase;

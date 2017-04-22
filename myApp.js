@@ -1,15 +1,28 @@
 'use strict';
 
 let vorpal = require('vorpal')();
-console.log("WELCOME TO MY CONTACT MANAGER!!")
-console.log("An app that allows you add a contact to your database, search for an existing contact,,sends a text to a contact.\n")
+const chalk = require('chalk');
+let CLI = require('clui');
+var Spinner  = CLI.Spinner;
+var status = new Spinner('Fetching from database, please wait...');
+console.log(chalk.bold.blue("\n"+ "WELCOME TO MY CONTACT MANAGER!!"))
+
+console.log("An app that allows you add a contact to your database,"+ 
+  "search for an existing contact, sends a text to a contact.\n")
+
 console.log("Guide:\t")
-console.log("Follow this guide and you are on your way to exploring this great app.")
-console.log(' add -n "name" -p "phoneNumber " : "adds a contact " ', 'search "name": searches for a contact name and returns the number\n, text (name) -m: sends a message to a contact')
+
+console.log("Follow this guide and you are on your way "+
+  " to exploring this great app.")
+
+console.log("add -n " +chalk.bold.red("<name> -p <phoneNumber>:") + " "  + 
+  "Adds contact to database" + "\n"+
+" search <name>: searches for a contact " +"\n" +
+" text <name> -m <message>: sends sms to specified contact");
 
 let fireBase = require('./functs.js')
 vorpal
-  .command('add <name> <phoneNumber>', 'Add user datas')
+  .command('add <name> -p <phoneNumber>', 'Add user datas')
   .option('-n, --name', "Adds full name e.g 'Andela Clinton' ")
   .option('-p, --phoneNumber', "Adds phone number e.g 080******** ")
   .description('Outputs "save".')
@@ -18,12 +31,21 @@ vorpal
     let fullName = args.name;
     new_number = "0" + new_number.toString();
     let contactName = fullName.split(" "); //Splitting the names value to get first and last name
-    //if(fullName.length > 3 && new_number.length===11){ //Validate the length of user's input
-    if (fireBase.addToDataBase(contactName[0], contactName[1], new_number)) {
+    if(fullName.length > 3 && new_number.length===11  && contactName[1] != undefined){ //Validate the length of user's input
 
-      console.log("Added Successfully!")
+      if (fireBase.addToDataBase(contactName[0], contactName[1], new_number)) {
+        console.log("Added Successfully!")
+      }
+
+    }
+    else if(contactName[1] === undefined){
+      console.log(chalk.bold.red("Invalid name entered: use the add -n command to enter your 'firstname and lastname' "  ))
     }
 
+    else {
+      console.log(chalk.bold.red("Invalid details supplied!!/Enter a valid name and phonenumber"))
+    }
+       
     callback();
   });
 
@@ -33,23 +55,22 @@ vorpal
   .description('Outputs "search"')
   .action(function(args, callback) {
     var searchTerms = args.name;
-    fireBase.search(searchTerms);
-    // var arrayOfSameName = fireBase.search(searchTerms)
+    fireBase.searchContact(searchTerms);
     callback();
   });
 
-// vorpal
-//    .command('text <name>', 'Sends sms to contact')
-//    .option('-m,--text <message>', "Sends specified message to user")
-//    .description('Outputs "search"')
-//    .action(function(args, callback) {
-//     var new_num= args.name;
-//     var new_message= args.text
-//      fireBase.sendSms(07038399928, new_message);
-//      // if(fireBase.sendSms===search)
-//      console.log("text successfully sent")
-//     callback();
-//   });     
+vorpal
+   .command('text <name>', 'Sends sms to contact')
+   .option('-m,--text <message>', "Sends specified message to user")
+   .description('Outputs "search"')
+   .action(function(args, callback) {
+    var new_num = args.name;
+    var new_message= args.text
+     fireBase.sendSms(num, msg);
+     // if(fireBase.sendSms===search)
+     console.log("text successfully sent")
+    callback();
+  });     
 
 vorpal
   .delimiter('Contact-App$')
