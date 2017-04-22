@@ -3,20 +3,27 @@
 let vorpal = require('vorpal')();
 const chalk = require('chalk');
 let CLI = require('clui');
+var figlet = require('figlet');
 var Spinner  = CLI.Spinner;
 var status = new Spinner('Fetching from database, please wait...');
-console.log(chalk.bold.blue("\n"+ "WELCOME TO MY CONTACT MANAGER!!"))
 
-console.log("An app that allows you add a contact to your database,"+ 
-  "search for an existing contact, sends a text to a contact.\n")
+console.log(
+  chalk.blue(
+    figlet.textSync('My Contact App', { horizontalLayout: 'full' })
+  )
+);
+//console.log(chalk.bold.blue("\n"+ ""))
 
-console.log("Guide:\t")
+console.log(chalk.bold.red("An app that allows you add a contact to your database,")+ 
+  chalk.bold.blue("search for an existing contact, sends a text to a contact.\n"))
 
-console.log("Follow this guide and you are on your way "+
-  " to exploring this great app.")
+console.log(chalk.bold.underline.red("Guide:\t"))
 
-console.log("add -n " +chalk.bold.red("<name> -p <phoneNumber>:") + " "  + 
-  "Adds contact to database" + "\n"+
+console.log(chalk.bold.blue("Follow this guide and you are on your way "+
+  " to exploring this great app."))
+
+console.log(chalk.bold.red("add -n <name> -p <phoneNumber>:") + " "  + 
+  chalk.bold.blue("Adds contact to database" + "\n")+
 " search <name>: searches for a contact " +"\n" +
 " text <name> -m <message>: sends sms to specified contact");
 
@@ -60,15 +67,16 @@ vorpal
   });
 
 vorpal
-   .command('text <name>', 'Sends sms to contact')
-   .option('-m, --message', "Sends specified message to user")
-   .description('Outputs "send sms"')
-   .action(function(args, callback) {
+ .command('text <name>', 'Sends sms to contact')
+ .option('-m, --message', "Sends specified message to user")
+ .description('Outputs "send sms"')
+ .action(function(args, callback) {
     var name = fireBase.searchForSms(args.name);
     var new_message = args.message;
-     name.then(fireBase.sendSms(name, new_message), console.log("error"))
-    
-     
+     if(fireBase.sendSms(name, new_message)){
+        console.log("text successfully sent")
+      }
+       
     callback();
   });     
 

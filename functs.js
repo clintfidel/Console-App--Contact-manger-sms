@@ -37,12 +37,11 @@ var getDataFromDataBase = {
       var data = Object.values(valx);
       var bool = false;
       var myArr = [];
-      var track;
       for (var i = 0; i < data.length; i++) {
         if (searchTerm === data[i].firstName) {
-          myArr.push([data[i], data[i].lastName]);
+          myArr.push([data[i], data[i].lastName, 1]);
         } else if (searchTerm === data[i].lastName) {
-          myArr.push([data[i], data[i].firstName]);
+          myArr.push([data[i], data[i].firstName, 2]);
         }
       }
       if (myArr.length === 0) {
@@ -62,56 +61,18 @@ var getDataFromDataBase = {
       });
       if (bool) {
         readLine.question(message + " ", (answer) => {
-          console.log('\n The number is: ' + "\n------------------" + "\n" + myArr[answer][0].phoneNumber+ "\n" + "------------------");
-          readLine.close();
+          console.log('\n The number is: ' + "\n------------------" + "\n" + myArr[answer][0].phoneNumber + "\n" + "------------------");
+          // rl.close();
+          return true;
         });
+
       }
     });
   },
 
-  searchForSms: function(searchTerm) {
-    ref.on("value", function(snapshot) {
-      var valx = snapshot.val();
-      var data = Object.values(valx);
-      var bool = false;
-      var myArr = [];
-      var track;
-      for (var i = 0; i < data.length; i++) {
-        if (searchTerm === data[i].firstName) {
-          myArr.push([data[i], data[i].lastName]);
-        } else if (searchTerm === data[i].lastName) {
-          myArr.push([data[i], data[i].firstName]);
-        }
-      }
-      if (myArr.length === 0) {
-        console.log("The name can not be found");
-      } else if (myArr.length === 1) {
-        console.log("The number is: " + myArr[0][0].phoneNumber);
-      } else {
-        var message = "Which " + searchTerm + "?";
-        for (var j = 0; j < myArr.length; j++) {
-          message = message + "  " + "[" + (j + 1).toString() + "]" + " " + myArr[j][1];
-          bool = true;
-        }
-      }
-
-      const readLine = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout
-      });
-      if (bool) {
-        readLine.question(message + " ", (answer) => {
-          console.log(myArr[answer][0].phoneNumber);
-          readLine.close();
-        });
-      }
-    })
-    ;
-  },
-
-  sendSms: function(name, msg) {
+  sendSms: function(num, msg) {
     var payload = {
-      to: name,
+      to: num,
       from: 'Clintfidel',
       message: msg
     };
