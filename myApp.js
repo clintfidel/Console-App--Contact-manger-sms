@@ -10,7 +10,7 @@ var status = new Spinner('Fetching from database, please wait...');
 console.log(
   chalk.blue(
     figlet.textSync('My Contact App', {
-      horizontalLayout: 'full'
+      horizontalLayout: ''
     })
   )
 );
@@ -29,6 +29,7 @@ console.log(chalk.bold.red("add -n <name> -p <phoneNumber>:") + " " +
   chalk.bold.red(" text <name> -m <message>: sends sms to specified contact"));
 
 let fireBase = require('./functs.js')
+
 vorpal
   .command('add <name> -p <phoneNumber>', 'Add user datas')
   .option('-n, --name', "Adds full name e.g 'Andela Clinton' ")
@@ -39,7 +40,9 @@ vorpal
     let fullName = args.name;
     new_number = "0" + new_number.toString();
     let contactName = fullName.split(" "); //Splitting the names value to get first and last name
-    if (fullName.length > 3 && new_number.length === 11 && contactName[1] != undefined) { //Validate the length of user's input
+    if (fullName.length > 3 && new_number.length === 11 
+    && contactName[1] != undefined 
+    && contactName[0].match(/[0-9]/g) === false) { //Validate the length of user's input
 
       if (fireBase.addToDataBase(contactName[0], contactName[1], new_number)) {
         console.log(chalk.bold.green("Added Successfully!"))
@@ -49,7 +52,7 @@ vorpal
       console.log(chalk.bold.yellow("Invalid name entered: use the add -n command to enter your 'firstname and lastname' "))
 
     } else {
-      console.log(chalk.bold.red("Invalid details supplied!!/Enter a valid name and phonenumber"))
+      console.log(chalk.bold.red("Invalid details supplied!! /Enter a valid name and phonenumber"))
     }
 
     callback();
@@ -70,14 +73,13 @@ vorpal
   .option('-m, --message', "Sends specified message to user")
   .description('Outputs "send sms"')
   .action(function(args, callback) {
-    var name = fireBase.searchForSms(args.name);
+    var name = fireBase.searchContact(args.name);
     var new_message = args.message;
-    if(typeof name === 'number'){
-      fireBase.sendSms(name, new_message);
-    }
-    else{
-      console.log("there is an error")
-    }
+    
+   name.then(function(result){
+    console.log()
+   })
+   
 
     callback();
   });

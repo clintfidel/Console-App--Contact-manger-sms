@@ -46,6 +46,7 @@ let  getDataFromDataBase = {
         }
       }
       if (myArr.length === 0) {
+        
         console.log("The name can not be found");
       } else if (myArr.length === 1) {
         console.log("The number is: " + myArr[0][0].phoneNumber);
@@ -63,7 +64,7 @@ let  getDataFromDataBase = {
       if (bool) {
         readLine.question(message + " ", (answer) => {
           console.log("\n" + "The number is: " + "\n" + "------------------" + "\n" 
-            + myArr[answer][0].phoneNumber + "\n" + "------------------ " + "\n"
+            + myArr[answer-1][0].phoneNumber + "\n" + "------------------ " + "\n"
             + "To successfully continue: " + chalk.bold.white("press CTRL + C"));
           // rl.close();
           return true;
@@ -72,7 +73,10 @@ let  getDataFromDataBase = {
       }
     });
   },
-
+  checkLetter: function(text){
+    text = text.toString();
+    return text.match(/[0-9]/g);
+  },
   searchForSms: function(searchTerm) {
     ref.on("value", function(snapshot) {
       var valx = snapshot.val();
@@ -87,10 +91,11 @@ let  getDataFromDataBase = {
         }
       }
       if (myArr.length === 0) {
-        console.log("The name can not be found");
-        
+        console.log("The name can not be found" + "\n"
+            + "To successfully continue: " + chalk.bold.white("press CTRL + C"));
+
       } else if (myArr.length === 1) {
-        return(myArr[0][0].phoneNumber);
+        console.log(Number(myArr[0][0].phoneNumber));
 
       } else {
         var message = "Which " + searchTerm + "?";
