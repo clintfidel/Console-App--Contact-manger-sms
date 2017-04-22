@@ -4,28 +4,29 @@ let vorpal = require('vorpal')();
 const chalk = require('chalk');
 let CLI = require('clui');
 var figlet = require('figlet');
-var Spinner  = CLI.Spinner;
+var Spinner = CLI.Spinner;
 var status = new Spinner('Fetching from database, please wait...');
 
 console.log(
   chalk.blue(
-    figlet.textSync('My Contact App', { horizontalLayout: 'full' })
+    figlet.textSync('My Contact App', {
+      horizontalLayout: 'full'
+    })
   )
 );
-//console.log(chalk.bold.blue("\n"+ ""))
 
-console.log(chalk.bold.red("An app that allows you add a contact to your database,")+ 
-  chalk.bold.blue("search for an existing contact, sends a text to a contact.\n"))
+console.log(chalk.bold.blue("An app that allows you add a contact to your database,") +
+  chalk.bold.blue("search for an existing contact, sends a text to a contact in the database.\n"))
 
 console.log(chalk.bold.underline.red("Guide:\t"))
 
-console.log(chalk.bold.blue("Follow this guide and you are on your way "+
+console.log(chalk.bold.blue("Follow this guide and you are on your way " +
   " to exploring this great app."))
 
-console.log(chalk.bold.red("add -n <name> -p <phoneNumber>:") + " "  + 
-  chalk.bold.blue("Adds contact to database" + "\n")+
-" search <name>: searches for a contact " +"\n" +
-" text <name> -m <message>: sends sms to specified contact");
+console.log(chalk.bold.red("add -n <name> -p <phoneNumber>:") + " " +
+  chalk.bold.red("Adds contact to database" + "\n") +
+  chalk.bold.red(" search <name>: searches for a contact " + "\n") +
+  chalk.bold.red(" text <name> -m <message>: sends sms to specified contact"));
 
 let fireBase = require('./functs.js')
 vorpal
@@ -38,47 +39,63 @@ vorpal
     let fullName = args.name;
     new_number = "0" + new_number.toString();
     let contactName = fullName.split(" "); //Splitting the names value to get first and last name
-    if(fullName.length > 3 && new_number.length===11  && contactName[1] != undefined){ //Validate the length of user's input
+    if (fullName.length > 3 && new_number.length === 11 && contactName[1] != undefined) { //Validate the length of user's input
 
       if (fireBase.addToDataBase(contactName[0], contactName[1], new_number)) {
-        console.log("Added Successfully!")
+        console.log(chalk.bold.green("Added Successfully!"))
       }
 
-    }
-    else if(contactName[1] === undefined){
-      console.log(chalk.bold.red("Invalid name entered: use the add -n command to enter your 'firstname and lastname' "  ))
-    }
+    } else if (contactName[1] === undefined) {
+      console.log(chalk.bold.yellow("Invalid name entered: use the add -n command to enter your 'firstname and lastname' "))
 
-    else {
+    } else {
       console.log(chalk.bold.red("Invalid details supplied!!/Enter a valid name and phonenumber"))
     }
-       
+
     callback();
   });
 
 vorpal
-  .command('search <name>', 'searches for a users data')
+  .command('search <name>', 'searches for a users data') 
   .option('search', "searchs for users firstname e.g 'Andela' ")
   .description('Outputs "search"')
   .action(function(args, callback) {
     var searchTerms = args.name;
-      fireBase.searchContact(searchTerms)
-    
+    fireBase.searchContact(searchTerms)
+
   });
 
 vorpal
- .command('text <name>', 'Sends sms to contact')
- .option('-m, --message', "Sends specified message to user")
- .description('Outputs "send sms"')
- .action(function(args, callback) {
+  .command('text <name>', 'Sends sms to contact')
+  .option('-m, --message', "Sends specified message to user")
+  .description('Outputs "send sms"')
+  .action(function(args, callback) {
     var name = fireBase.searchForSms(args.name);
     var new_message = args.message;
-     if(fireBase.sendSms(name, new_message)){
-        console.log("text successfully sent")
-      }
-       
+    if(typeof name === 'number'){
+      fireBase.sendSms(name, new_message);
+    }
+    else{
+      console.log("there is an error")
+    }
+
     callback();
-  });     
+  });
+
+// vorpal
+// .command('delete <name> [phoneNumber]', 'delete contact')
+// .option('-d, --message', "deletes specified user contact")
+// .description('Outputs "deletes contact"')
+// .action(function(args, callback) {
+//   var deleteName = args.name;
+//   var deleteNum = args.phoneNumber;
+//   if (fireBase.sendSms(name, new_message)) {
+//     console.log(chalk.bold.green("text successfully sent"))
+//   }
+
+//   callback();
+//   });
+
 
 vorpal
   .delimiter('Contact-App$')
