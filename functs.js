@@ -7,7 +7,8 @@ var jusibe = new Jusibe("fa2b6a5fe2019548f05b34f17819d5a1", "8c5e94d8c3fe93c4da9
 firebase.initializeApp(config);
 var database = firebase.database(); //creating an instance of firebase
 var ref = database.ref("/users");
-
+var stdin = process.openStdin();
+const readline = require('readline');
 var getDataFromDataBase = {
 
   addToDataBase: function(firstName, lastName, phoneNumber) {
@@ -36,11 +37,12 @@ var getDataFromDataBase = {
       var data = Object.values(valx);
       var bool = false;
       var myArr = [];
+      var track;
       for (var i = 0; i < data.length; i++) {
         if (searchTerm === data[i].firstName) {
-          myArr.push([data[i], data[i].lastName, 1]);
+          myArr.push([data[i], data[i].lastName]);
         } else if (searchTerm === data[i].lastName) {
-          myArr.push([data[i], data[i].firstName, 2]);
+          myArr.push([data[i], data[i].firstName]);
         }
       }
       if (myArr.length === 0) {
@@ -54,16 +56,62 @@ var getDataFromDataBase = {
           bool = true;
         }
       }
+      const readLine = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+      });
       if (bool) {
-        console.log(message);
-
+        readLine.question(message + " ", (answer) => {
+          console.log('\n The number is: ' + "\n------------------" + "\n" + myArr[answer][0].phoneNumber+ "\n" + "------------------");
+          readLine.close();
+        });
       }
     });
   },
 
-  sendSms: function(num, msg) {
+  searchForSms: function(searchTerm) {
+    ref.on("value", function(snapshot) {
+      var valx = snapshot.val();
+      var data = Object.values(valx);
+      var bool = false;
+      var myArr = [];
+      var track;
+      for (var i = 0; i < data.length; i++) {
+        if (searchTerm === data[i].firstName) {
+          myArr.push([data[i], data[i].lastName]);
+        } else if (searchTerm === data[i].lastName) {
+          myArr.push([data[i], data[i].firstName]);
+        }
+      }
+      if (myArr.length === 0) {
+        console.log("The name can not be found");
+      } else if (myArr.length === 1) {
+        console.log("The number is: " + myArr[0][0].phoneNumber);
+      } else {
+        var message = "Which " + searchTerm + "?";
+        for (var j = 0; j < myArr.length; j++) {
+          message = message + "  " + "[" + (j + 1).toString() + "]" + " " + myArr[j][1];
+          bool = true;
+        }
+      }
+
+      const readLine = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+      });
+      if (bool) {
+        readLine.question(message + " ", (answer) => {
+          console.log(myArr[answer][0].phoneNumber);
+          readLine.close();
+        });
+      }
+    })
+    ;
+  },
+
+  sendSms: function(name, msg) {
     var payload = {
-      to: num,
+      to: name,
       from: 'Clintfidel',
       message: msg
     };
